@@ -33,16 +33,19 @@ public class JwtFilter extends OncePerRequestFilter {
         String token = resolveToken(request);
 
         if (token != null && jwtTokenProvider.validateToken(token)) {
-            Long userId = jwtTokenProvider.getUserId(token);
-            // DB에 등록된 유저인지 확인
-            User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("user not found id = " + userId));
-            UserDto userDto = UserDto.fromEntity(user);
+            // 토큰 갱신 엔드포인트는 refresh 토큰만 접근 가능.
+            String refreshURI = "/api/auth/refresh";
+            if ((jwtTokenProvider.isAccessToken(token) && !refreshURI.equals(request.getRequestURI()))|| (jwtTokenProvider.isRefreshToken(token) && refreshURI.equals(request.getRequestURI()))) {
+                // DB에 등록된 유저인지 확인
+                Long userId = jwtTokenProvider.getUserId(token);
+                User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("user not found id = " + userId));
+                UserDto userDto = UserDto.fromEntity(user);
 
-            // AuthenticationToken 객체에 User 정보 및 권한 추가
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDto, null, Collections.singletonList(new SimpleGrantedAuthority(user.getRoleKey())));
-            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                // AuthenticationToken 객체에 User 정보 및 권한 추가
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDto, null, Collections.singletonList(new SimpleGrantedAuthority(user.getRoleKey())));
+                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            }
         }
 
         filterChain.doFilter(request, response);

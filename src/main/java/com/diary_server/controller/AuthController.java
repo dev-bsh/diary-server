@@ -1,11 +1,15 @@
 package com.diary_server.controller;
 
-import com.diary_server.dto.JwtDto;
+import com.diary_server.dto.JwtResponse;
 import com.diary_server.dto.UserDto;
+import com.diary_server.model.User;
 import com.diary_server.service.AuthService;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.sql.results.internal.ResolvedSqlSelection;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,9 +33,9 @@ public class AuthController {
         response.sendRedirect(uri);
     }
 
-    @GetMapping("/token")
-    public ResponseEntity<JwtDto> token(@AuthenticationPrincipal UserDto userDto) {
-        JwtDto newToken = authService.getNewToken(userDto);
+    @GetMapping("/refresh")
+    public ResponseEntity<JwtResponse> token(@AuthenticationPrincipal UserDto userDto) {
+        JwtResponse newToken = authService.getNewToken(userDto);
         return ResponseEntity.ok(newToken);
     }
 

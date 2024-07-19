@@ -1,6 +1,6 @@
 package com.diary_server.service;
 
-import com.diary_server.dto.JwtDto;
+import com.diary_server.dto.JwtResponse;
 import com.diary_server.dto.UserDto;
 import com.diary_server.model.RefreshToken;
 import com.diary_server.repository.RefreshTokenRepository;
@@ -15,7 +15,7 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
-    public JwtDto getNewToken(UserDto userDto) {
+    public JwtResponse getNewToken(UserDto userDto) {
         String accessToken = jwtTokenProvider.createToken(userDto.getId(), userDto.getRole());
         String refreshToken = jwtTokenProvider.createRefreshToken(userDto.getId(), userDto.getRole());
         // refresh token DB update
@@ -29,7 +29,7 @@ public class AuthService {
                 );
         refreshTokenRepository.save(TokenEntity);
 
-        return JwtDto.builder()
+        return JwtResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();

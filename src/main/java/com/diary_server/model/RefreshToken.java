@@ -14,7 +14,7 @@ import java.util.Date;
 @Entity
 @Getter
 @NoArgsConstructor
-public class RefreshToken {
+public class RefreshToken extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

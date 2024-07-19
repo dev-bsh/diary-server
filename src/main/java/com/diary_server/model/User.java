@@ -5,10 +5,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 @Entity
 @Getter
 @NoArgsConstructor
-public class User {
+public class User extends BaseEntity{
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -20,6 +23,9 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Diary> diaries = new LinkedHashSet<>();
+
     @Builder
     public User(String username, String email, String provider, String providerId, Role role) {
         this.username = username;
@@ -29,9 +35,8 @@ public class User {
         this.role = role;
     }
 
-    public User update(String name, String email) {
-        if (name != null && email != null) {
-            this.username = name;
+    public User update(String email) {
+        if (email != null) {
             this.email = email;
         }
         return this;

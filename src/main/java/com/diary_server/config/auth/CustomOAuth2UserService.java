@@ -56,7 +56,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     public void saveOrUpdate(OAuth2UserInfo userInfo) {
         User user = userRepository.findByProviderAndProviderId(userInfo.getProvider(), userInfo.getProviderId())
-                .map(entity -> entity.update(userInfo.getName(), userInfo.getEmail()))
+                .map(entity -> entity.update(userInfo.getEmail()))
                 .orElse(User.builder()
                         .username(userInfo.getName())
                         .email(userInfo.getEmail())

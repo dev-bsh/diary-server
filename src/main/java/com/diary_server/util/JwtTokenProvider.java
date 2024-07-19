@@ -24,22 +24,26 @@ public class JwtTokenProvider {
 
     private Key key;
 
+    private final String ACCESS = "access";
+    private final String REFRESH = "refresh";
+
     @PostConstruct
     protected void init() {
         key = Keys.hmacShaKeyFor(secretKey.getBytes());
     }
 
     public String createToken(Long userId, Role role) {
-        return createToken(userId, role, tokenPeriod);
+        return createToken(userId, role, tokenPeriod, ACCESS);
     }
 
     public String createRefreshToken(Long userId, Role role) {
-        return createToken(userId, role, refreshTokenPeriod);
+        return createToken(userId, role, refreshTokenPeriod, REFRESH);
     }
 
-    public String createToken(Long userId, Role role, long period) {
+    public String createToken(Long userId, Role role, long period, String type) {
         Claims claims = Jwts.claims().setSubject(String.valueOf(userId));
         claims.put("role", role);
+        claims.put("type", type);
 
         Date now = new Date();
         Date validity = new Date(now.getTime() + period);
@@ -49,6 +53,16 @@ public class JwtTokenProvider {
                 .setExpiration(validity)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    public boolean isAccessToken(String token) {
+        String type = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody().get("type", String.class);
+        return type.equals(ACCESS);
+    }
+
+    public boolean isRefreshToken(String token) {
+        String type = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody().get("type", String.class);
+        return type.equals(REFRESH);
     }
 
     public Long getUserId(String token) {

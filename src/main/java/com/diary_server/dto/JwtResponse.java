@@ -7,12 +7,12 @@ import lombok.Setter;
 
 @NoArgsConstructor
 @Getter @Setter
-public class JwtDto {
+public class JwtResponse {
     String accessToken;
     String refreshToken;
 
     @Builder
-    public JwtDto(String accessToken, String refreshToken) {
+    public JwtResponse(String accessToken, String refreshToken) {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
     }
