@@ -14,11 +14,10 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -40,10 +39,9 @@ public class DiaryService {
     @PostConstruct
     public void init() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        ClassPathResource resource = new ClassPathResource(dataFileName);
-        try (InputStream inputStream = resource.getInputStream()) {
-            this.promptTemplates = objectMapper.readValue(inputStream, new TypeReference<>() {});
-        }
+        File file = new File(dataFileName);
+        this.promptTemplates = objectMapper.readValue(file, new TypeReference<>() {
+        });
     }
 
     public Long saveDiary(DiarySaveRequest diarySaveRequest, UserDto userDto) {
